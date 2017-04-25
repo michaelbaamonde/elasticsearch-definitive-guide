@@ -33,7 +33,12 @@ contains some critical information about your cluster:
    "active_shards": 10,
    "relocating_shards": 0,
    "initializing_shards": 0,
-   "unassigned_shards": 0
+   "unassigned_shards": 0,
+   "delayed_unassigned_shards" : 0,
+   "number_of_pending_tasks" : 0,
+   "number_of_in_flight_fetch" : 0,
+   "task_max_waiting_in_queue_millis" : 0,
+   "active_shards_percent_as_number" : 100.0
 }
 ----
 
@@ -77,6 +82,22 @@ found in the cluster itself.  A common source of unassigned shards are unassigne
 replicas.  For example, an index with five shards and one replica will have five unassigned
 replicas in a single-node cluster.  Unassigned shards will also be present if your
 cluster is `red` (since primaries are missing).
+- `delayed_unassigned_shards` are shards whose allocation has been intentionally
+delayed. The index-level setting `index.unassigned.node_left.delayed_timeout`
+defines a grace period during which Elasticsearch will not attempt to reallocate
+shards that have become unavailable due to a node leaving the cluster. This is
+useful for minimizing network traffic in the face of brief losses of
+connectivity between nodes.
+- `number_of_pending_tasks` is the number of pending updates to the cluster
+state. Examples of such tasks include index creation, mapping updates, and shard
+allocation. Typically, this number will be zero, as changes to the cluster state
+are fast.
+- `number_of_in_flight_fetch` is a count of ongoing shard info requests. The
+master node needs to fetch metadata from shards in order to inform allocation.
+- `task_max_waiting_in_queue_millis` returns how long the oldest
+currently-queued task has been in the task queue.
+- `active_shards_percent_as_number` is the percentage of the cluster's total
+shards (primaries and replicas) that are currently active.
 
 ==== Drilling Deeper: Finding Problematic Indices
 
@@ -95,7 +116,12 @@ looks like this:
    "active_shards": 180,
    "relocating_shards": 0,
    "initializing_shards": 0,
-   "unassigned_shards": 20
+   "unassigned_shards": 20,
+   "delayed_unassigned_shards" : 0,
+   "number_of_pending_tasks" : 0,
+   "number_of_in_flight_fetch" : 0,
+   "task_max_waiting_in_queue_millis" : 0,
+   "active_shards_percent_as_number" : 90.0
 }
 ----
 
@@ -133,7 +159,12 @@ unassigned shards, and so forth):
    "active_shards": 180,
    "relocating_shards": 0,
    "initializing_shards": 0,
-   "unassigned_shards": 20
+   "unassigned_shards": 20,
+   "delayed_unassigned_shards" : 0,
+   "number_of_pending_tasks" : 0,
+   "number_of_in_flight_fetch" : 0,
+   "task_max_waiting_in_queue_millis" : 0,
+   "active_shards_percent_as_number" : 90.0,
    "indices": {
       "v1": {
          "status": "green",
